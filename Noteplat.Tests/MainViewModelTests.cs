@@ -1,6 +1,7 @@
 using Noteplat.Models;
 using Noteplat.ViewModels;
 using ReactiveUI;
+using System.Collections.Generic;
 using System.Text;
 namespace Noteplat.Tests
 {
@@ -8,42 +9,9 @@ namespace Noteplat.Tests
     public class MainViewModelTests
     {
 
-        UnitTestRepository _repository = new UnitTestRepository();
-        [Fact]
-        public void SaveText()
-        {
-            var filename =Path.GetTempFileName();
-            MainViewModel mv = new(_repository);
+        IRepository _repository = new UnitTestRepository();
 
-            //Tests
-            mv.TextDocument = new TextDocument(filename, GenerateLargeText(10000));
-            Assert.Equal(filename,mv.TextDocument.Filename);
-            
-            //Save document
-            mv.SaveCommand.Execute();
-
-            //Check document exists
-            Assert.True(File.Exists(filename));
-            File.Delete(mv.TextDocument.Filename);
-        }
-
-        [Fact]
-        public void LoadText()
-        {
-            var filename =Path.GetTempFileName();
-            var contents = "Hello";
-            _repository.Save(filename, contents);
-
-            MainViewModel mv = new(_repository);
-
-
-            _repository.SetFilePick(filename);
-            mv.LoadCommand.Execute();
-
-            Assert.Equal(contents, mv.TextDocument.Text);
-        }
-
-        public static string GenerateLargeText(int length)
+        private static string GenerateLargeText(int length)
         {
             // Define the characters to use in the text
             string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -59,6 +27,73 @@ namespace Noteplat.Tests
             }
 
             return sb.ToString();
+        }
+
+        [Fact]
+        public async void TestFileSystem()
+        {
+            var filename = Path.GetTempFileName();
+            var contents = "Hello";
+            _repository.WriteAllText(filename, contents);
+
+            var pickedFile = await _repository.PickFileLoad();
+        
+            Assert.Equal(filename, pickedFile);
+        }
+
+
+        [Fact]
+        public void SaveText()
+        {
+            // arrange
+            var filename = Path.GetTempFileName();
+            Assert.False(_repository.Exists(filename));
+
+            MainViewModel mv = new(_repository);
+
+            mv.TextDocument = new TextDocument(filename, GenerateLargeText(10000));
+            Assert.Equal(filename, mv.TextDocument.Filename);
+
+            // act
+            mv.SaveCommand.Execute().Subscribe();
+
+            // Assert
+            Assert.True(_repository.Exists(filename));
+            _repository.Delete(filename);
+        }
+
+        [Fact]
+        public void LoadText()
+        {
+            var filename = Path.GetTempFileName();
+            var contents = "Hello";
+            _repository.WriteAllText(filename, contents);
+
+            MainViewModel mv = new(_repository);
+
+            mv.LoadCommand.Execute().Subscribe();
+
+            Assert.Equal(contents, mv.TextDocument.Text);
+        }
+
+        [Fact]
+        public void ReverseText()
+        {
+            var filename = Path.GetTempFileName();
+            var contents = "One" + Environment.NewLine + "Two" + Environment.NewLine + "Three" + Environment.NewLine;
+
+            MainViewModel mv = new(_repository);
+            mv.TextDocument = new TextDocument()
+            {
+                Filename = filename,
+                Text = contents
+            };
+
+            mv.ReverseCommand.Execute().Subscribe();
+            Assert.NotEqual(contents, mv.TextDocument.Text);
+
+            mv.ReverseCommand.Execute().Subscribe();
+            Assert.Equal(contents, mv.TextDocument.Text);
         }
     }
 }

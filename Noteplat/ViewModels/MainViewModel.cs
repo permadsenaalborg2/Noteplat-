@@ -6,6 +6,7 @@ using ReactiveUI;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ public class MainViewModel : ViewModelBase
 {
     public ReactiveCommand<Unit, Unit> SaveCommand { get; set; }
     public ReactiveCommand<Unit, Unit> LoadCommand { get; set; }
+    public ReactiveCommand<Unit, Unit> ReverseCommand { get; set; }
 
     TextDocument _textDocument = new TextDocument();
     public TextDocument TextDocument
@@ -24,28 +26,41 @@ public class MainViewModel : ViewModelBase
     }
     public MainViewModel(IRepository repository) : base(repository)
     {
-        SaveCommand = ReactiveCommand.Create(saveCommand);
+        SaveCommand = ReactiveCommand.CreateFromTask(saveCommand);
         LoadCommand = ReactiveCommand.CreateFromTask(loadCommand);
-
+        ReverseCommand = ReactiveCommand.Create(reverseCommand);
     }
 
     async Task loadCommand()
     {
-        string path = await _repository.PickFile();
-        if (File.Exists(path))
+        string path = await _repository.PickFileLoad();
+        if (_repository.Exists(path))
         {
             TextDocument = new TextDocument()
             {
                 Filename = path,
-                Text = File.ReadAllText(path)
+                Text = _repository.ReadAllText(path)
             };
         }
     }
-    void saveCommand()
+    async Task saveCommand()
     {
-        //_repository.Save(_textDocument.Filename, _textDocument.Text);
-        File.WriteAllText(_textDocument.Filename, _textDocument.Text);
+        if (_textDocument.Filename==String.Empty)
+        {
+            _textDocument.Filename = await _repository.PickFileSave();
+
+        }
+        _repository.WriteAllText(_textDocument.Filename, _textDocument.Text);
     }
 
-    
+    public void reverseCommand()
+    {
+        var list = TextDocument.Text.Split(Environment.NewLine).ToList();
+        list.Reverse();
+        TextDocument = new TextDocument()
+        {
+            Filename = TextDocument.Filename,
+            Text = String.Join(Environment.NewLine, list)
+        };
+    }
 }

@@ -8,7 +8,11 @@ namespace Noteplat;
 
 public interface IRepository
 {
-    string Load(string filename);
-    void Save(string filename, string contents);
-    Task<string> PickFile();
+    public bool Exists(string filename);
+    public string ReadAllText(string filename);
+    public void WriteAllText(string filename, string contents);
+    public void Delete(String filename);
+
+    Task<string> PickFileLoad();
+    Task<string> PickFileSave();
 }

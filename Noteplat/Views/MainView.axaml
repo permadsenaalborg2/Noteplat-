@@ -22,6 +22,7 @@
 			<MenuItem Header="_Edit">
 				<MenuItem Header="Copy"/>
 				<MenuItem Header="Paste"/>
+				<MenuItem Header="Reverse"  Command="{Binding ReverseCommand}"/>
 			</MenuItem>
 		</Menu>
 		<StackPanel Orientation="Vertical">

@@ -7,19 +7,29 @@ namespace Noteplat;
 
 public class DesktopRepository : IRepository
 {
-    public string Load(string filename)
+
+    // wrapper for File functions
+    public bool Exists(string filename)
     {
-        if (File.Exists(filename))
-        {
-            return File.ReadAllText(filename);
-        }
-        return "";
+        return File.Exists(filename);
     }
-    public void Save(string filename, string contents)
+    
+    public string ReadAllText(string filename)
+    {
+        return File.ReadAllText(filename);
+    }
+    public void WriteAllText(string filename, string contents)
     {
         File.WriteAllText(filename, contents);
     }
-    public async Task<string> PickFile()
+
+    public void Delete(String filename)
+    {
+        File.Delete(filename);
+    }
+
+    // wrapper for OpenFilePicker
+    public async Task<string> PickFileLoad()
     {
         var window = MainWindow.GetMainWindow() ?? throw new Exception("Unable to open file dialog");
         FilePickerOpenOptions options = new();
@@ -32,5 +42,14 @@ public class DesktopRepository : IRepository
         }
 
         return path;
+    }
+
+    public async Task<string> PickFileSave()
+    {
+        var window = MainWindow.GetMainWindow() ?? throw new Exception("Unable to open file dialog");
+        FilePickerSaveOptions options = new();
+        options.ShowOverwritePrompt = true;
+        var result = await window.StorageProvider.SaveFilePickerAsync(options);
+        return result.Path.LocalPath;
     }
 }

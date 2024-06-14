@@ -11,7 +11,7 @@ public interface IRepository
     public bool Exists(string filename);
     public string ReadAllText(string filename);
     public void WriteAllText(string filename, string contents);
-    public void Delete(String filename);
+    public void Delete(string filename);
 
     Task<string> PickFileLoad();
     Task<string> PickFileSave();

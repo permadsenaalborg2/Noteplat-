@@ -45,7 +45,7 @@ public class MainViewModel : ViewModelBase
     }
     async Task saveCommand()
     {
-        if (_textDocument.Filename==String.Empty)
+        if (_textDocument.Filename == String.Empty)
         {
             _textDocument.Filename = await _repository.PickFileSave();
 

@@ -7,13 +7,12 @@ namespace Noteplat;
 
 public class DesktopRepository : IRepository
 {
-
     // wrapper for File functions
     public bool Exists(string filename)
     {
         return File.Exists(filename);
     }
-    
+
     public string ReadAllText(string filename)
     {
         return File.ReadAllText(filename);
@@ -23,7 +22,7 @@ public class DesktopRepository : IRepository
         File.WriteAllText(filename, contents);
     }
 
-    public void Delete(String filename)
+    public void Delete(string filename)
     {
         File.Delete(filename);
     }
@@ -50,6 +49,9 @@ public class DesktopRepository : IRepository
         FilePickerSaveOptions options = new();
         options.ShowOverwritePrompt = true;
         var result = await window.StorageProvider.SaveFilePickerAsync(options);
-        return result.Path.LocalPath;
+        if (result != null)
+            return result.Path.LocalPath;
+        else
+            return String.Empty;
     }
 }

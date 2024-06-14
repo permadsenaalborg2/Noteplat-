@@ -51,7 +51,8 @@ namespace Noteplat.Tests
 
             MainViewModel mv = new(_repository);
 
-            mv.TextDocument = new TextDocument(filename, GenerateLargeText(10000));
+            var contents = GenerateLargeText(10000);
+            mv.TextDocument = new TextDocument(filename, contents);
             Assert.Equal(filename, mv.TextDocument.Filename);
 
             // act
@@ -59,7 +60,13 @@ namespace Noteplat.Tests
 
             // Assert
             Assert.True(_repository.Exists(filename));
+
+            var new_contents = _repository.ReadAllText(filename);
+            Assert.Equal(new_contents, new_contents);
+
             _repository.Delete(filename);
+            Assert.False(_repository.Exists(filename));
+
         }
 
         [Fact]

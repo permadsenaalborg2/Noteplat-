@@ -12,14 +12,16 @@ public class UnitTestRepository : IRepository
 
     public async Task<string> PickFileLoad()
     {
-        return await Task.Run(() => {
+        return await Task.Run(() =>
+        {
             return Files.First().Key;
         });
     }
 
     public async Task<string> PickFileSave()
     {
-        return await Task.Run(() => {
+        return await Task.Run(() =>
+        {
             return Files.First().Key;
         });
     }
@@ -39,7 +41,7 @@ public class UnitTestRepository : IRepository
         Files[filename] = contents;
     }
 
-    void IRepository.Delete(string filename)
+    public void Delete(string filename)
     {
         Files.Remove(filename);
     }

@@ -14,15 +14,15 @@
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="_File">
-				<MenuItem Header="_Open..." Command="{Binding LoadCommand}"/>
+				<MenuItem Header="_Load..." Command="{Binding LoadCommand}"/>
 				<MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
 				<Separator/>
 				<MenuItem Header="_Exit"/>
 			</MenuItem>
 			<MenuItem Header="_Edit">
-				<MenuItem Header="Copy"/>
-				<MenuItem Header="Paste"/>
-				<MenuItem Header="Reverse"  Command="{Binding ReverseCommand}"/>
+				<MenuItem Header="_Copy"/>
+				<MenuItem Header="_Paste"/>
+				<MenuItem Header="_Reverse"  Command="{Binding ReverseCommand}"/>
 			</MenuItem>
 		</Menu>
 		<StackPanel Orientation="Vertical">
